@@ -66,13 +66,20 @@ Create a `.env` file in the root directory based on the provided `.env.example`:
 ```
 # Slack Bot Configuration
 SLACK_BOT_TOKEN=xoxb-your-bot-token
+SLACK_USER_TOKEN=xoxp-your-user-token
 SLACK_SIGNING_SECRET=your-signing-secret
+# Required only for Socket Mode (starts with xapp-)
+SLACK_APP_TOKEN=xapp-your-app-token
 
 # Server Configuration (optional)
 PORT=3000
 ```
 
-Replace the placeholder values with your actual Slack Bot Token and Signing Secret.
+Replace the placeholder values with your actual tokens and signing secret:
+- SLACK_BOT_TOKEN: Your Bot User OAuth Token (starts with `xoxb-`)
+- SLACK_USER_TOKEN: Your User OAuth Token (starts with `xoxp-`), required for star events
+- SLACK_SIGNING_SECRET: Your Signing Secret
+- SLACK_APP_TOKEN: Your App-Level Token (starts with `xapp-`), only required for Socket Mode
 
 ## Installation
 

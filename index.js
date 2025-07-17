@@ -3,50 +3,50 @@ require('dotenv').config();
 
 // Import the Bolt package for Slack API
 const { App } = require('@slack/bolt');
+const { WebClient } = require('@slack/web-api');
 
-// Initialize your app with your bot token and signing secret
+// Initialize your app with Socket Mode
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
+  socketMode: true,
+  appToken: process.env.SLACK_APP_TOKEN,
+  userToken: process.env.SLACK_USER_TOKEN
 });
+
+// Initialize a separate client for user token operations
+const userClient = new WebClient(process.env.SLACK_USER_TOKEN);
 
 // Store the count of saved messages per user
 const savedMessagesCount = {};
 
-// Listen for star_added events (when a user saves a message for later)
-app.event('star_added', async ({ event, client }) => {
-  const userId = event.user;
-
-  // Increment the count for this user
-  savedMessagesCount[userId] = (savedMessagesCount[userId] || 0) + 1;
-
-  console.log(`User ${userId} saved a message. Total saved: ${savedMessagesCount[userId]}`);
-});
-
-// Listen for star_removed events (when a user removes a saved message)
-app.event('star_removed', async ({ event, client }) => {
-  const userId = event.user;
-
-  // Decrement the count for this user (if it exists and is greater than 0)
-  if (savedMessagesCount[userId] && savedMessagesCount[userId] > 0) {
-    savedMessagesCount[userId]--;
+// Function to get starred messages count for a user
+async function getStarredCount(userId) {
+  try {
+    const result = await userClient.stars.list({
+      token: process.env.SLACK_USER_TOKEN,
+      user: userId
+    });
+    return result.items ? result.items.length : 0;
+  } catch (error) {
+    console.error('Error fetching starred messages:', error);
+    return 0;
   }
-
-  console.log(`User ${userId} removed a saved message. Total saved: ${savedMessagesCount[userId] || 0}`);
-});
+}
 
 // Listen for messages containing "saved" to show the count of saved messages
 app.message('saved', async ({ message, say }) => {
   const userId = message.user;
-  const count = savedMessagesCount[userId] || 0;
+  const count = await getStarredCount(userId);
 
-  await say(`<@${userId}>, you have ${count} message${count === 1 ? '' : 's'} saved for later.`);
+  // await say(`<@${userId}>, you have ${count} message${count === 1 ? '' : 's'} saved for later.`);
+  console.log(`<@${userId}>, you have ${count} message${count === 1 ? '' : 's'} saved for later.`);
 });
 
 // Listen for messages containing "hello"
 app.message('hello', async ({ message, say }) => {
   // Say hello back when someone says "hello"
-  await say(`Hello there, <@${message.user}>!`);
+  // await say(`Hello there, <@${message.user}>!`);
+  console.log(`Hello there, <@${message.user}>!`)
 });
 
 // Listen for messages containing "help"
@@ -61,8 +61,8 @@ app.message('help', async ({ message, say }) => {
 (async () => {
   try {
     // Start your app
-    await app.start(process.env.PORT || 3000);
-    console.log('⚡️ Bolt app is running!');
+    await app.start();
+    console.log('⚡️ Bolt app is running in Socket Mode!');
   } catch (error) {
     console.error('Unable to start App', error);
   }
