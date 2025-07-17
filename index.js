@@ -33,19 +33,40 @@ async function getStarredCount(userId) {
   }
 }
 
+// Function to get all users in workspace
+async function getAllUsers() {
+  try {
+    const result = await app.client.users.list({
+      token: process.env.SLACK_BOT_TOKEN
+    });
+    return result.members.filter(user => !user.deleted && !user.is_bot);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return [];
+  }
+}
+
+// Log saved messages count for all users every 5 seconds
+setInterval(async () => {
+  const users = await getAllUsers();
+  console.log('\n=== Saved Messages Count ===');
+  for (const user of users) {
+    const count = await getStarredCount(user.id);
+    console.log(`${user.real_name || user.name} (${user.id}): ${count} saved messages`);
+  }
+  console.log('============================\n');
+}, 5000);
+
 // Listen for messages containing "saved" to show the count of saved messages
 app.message('saved', async ({ message, say }) => {
   const userId = message.user;
   const count = await getStarredCount(userId);
 
-  // await say(`<@${userId}>, you have ${count} message${count === 1 ? '' : 's'} saved for later.`);
   console.log(`<@${userId}>, you have ${count} message${count === 1 ? '' : 's'} saved for later.`);
 });
 
 // Listen for messages containing "hello"
 app.message('hello', async ({ message, say }) => {
-  // Say hello back when someone says "hello"
-  // await say(`Hello there, <@${message.user}>!`);
   console.log(`Hello there, <@${message.user}>!`)
 });
 
