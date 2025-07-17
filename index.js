@@ -9,7 +9,6 @@ const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   socketMode: true,
   appToken: process.env.SLACK_APP_TOKEN,
-  userToken: process.env.SLACK_USER_TOKEN
 });
 
 // Store the count of inbox reactions per user

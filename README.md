@@ -12,22 +12,13 @@ A simple Slack bot built with the Bolt framework that responds to basic commands
 
 1. Create a new Slack App at [api.slack.com/apps](https://api.slack.com/apps)
 2. Under "OAuth & Permissions", add the following Bot Token Scopes:
-   - `chat:write`
-   - `app_mentions:read`
-   - `channels:history`
-   - `groups:history`
-   - `im:history`
-   - `mpim:history`
-   - `stars:read` (required for tracking saved messages)
+   - `reactions:read`
+   - `reactions:write`
 3. Enable Event Subscriptions:
    - Go to "Event Subscriptions" in the left sidebar
    - Toggle "Enable Events" to On
    - In the "Request URL" field, enter your public URL where the bot is hosted followed by `/slack/events` (e.g., `https://your-app-domain.com/slack/events`)
    - Under "Subscribe to bot events", add the following events:
-     - `message.channels`
-     - `message.groups`
-     - `message.im`
-     - `message.mpim`
      - `star_added` (required for tracking when messages are saved)
      - `star_removed` (required for tracking when saved messages are removed)
    - Click "Save Changes"
