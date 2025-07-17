@@ -6,8 +6,7 @@ A simple Slack bot built with the Bolt framework that responds to basic commands
 
 - Responds to "hello" messages with a personalized greeting
 - Provides help information when users type "help"
-- Tracks and counts messages saved for later by each user
-- Responds to "saved" messages with the count of messages saved by the current user
+- Tracks and counts messages with "inbox_tray" reactions
 
 ## Setup
 
